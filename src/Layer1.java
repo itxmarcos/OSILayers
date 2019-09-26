@@ -1,24 +1,17 @@
 import jpcap.*;
-import jpcap.packet.Packet;
+import jpcap.packet.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Layer1 extends Layer{
 	NetworkInterface[] devices;
 	JpcapCaptor captor;
 	JpcapSender sender;
-
-	public static void main(String[] args){
-		try {
-			Layer1 miLayer=new Layer1();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	ArrayList <Packet> misPaquetes=new ArrayList();
 	
 	public Layer1 () throws IOException{
 		devices = JpcapCaptor.getDeviceList();
@@ -52,7 +45,7 @@ public class Layer1 extends Layer{
 		}
 		
 		//Ask the user which interface to use
-		System.out.println("/n/nSelect an interface number from before: ");
+		System.out.println("\n\nSelect an interface number from before: ");
 		Scanner input = new Scanner(System.in);
 		int number = input.nextInt();
 		input.close();
@@ -60,49 +53,20 @@ public class Layer1 extends Layer{
 		return number;
 	}
 	
-	public void run(int number) {
+	public void run(int number) throws UnknownHostException {
 		//call processPacket() to let Jpcap call PacketPrinter.receivePacket() for every packet capture.
-		captor.processPacket(10,new PacketPrinter());
-		/*for(int i=0;i<10;i++){
-			  //capture a single packet and print it out
-			  System.out.println(captor.getPacket());
-			}*/
+		//captor.processPacket(10,new PacketPrinter());
+		for(int i=0;i<10;i++) {
+			Packet p = captor.getPacket();
+			while(p==null) p = captor.getPacket();
+			//capture a single packet and print it out
+			System.out.println(p);
+			//send the packet p
+			sender.sendPacket(p);
+			//store packet in an arraylist
+			misPaquetes.add(p);
+		}
 		captor.close();
-		
-		//create a TCP packet with specified port numbers, flags, and other parameters
-		TCPPacket p=new TCPPacket(12,34,56,78,false,false,false,false,true,true,true,true,10,10);
-
-		//specify IPv4 header parameters
-		p.setIPv4Parameter(0,false,false,false,0,false,false,false,0,1010101,100,IPPacket.IPPROTO_TCP,
-		InetAddress.getByName("www.microsoft.com"),InetAddress.getByName("www.google.com"));
-
-		//set the data field of the packet
-		p.data=("data").getBytes();
-
-		//create an Ethernet packet (frame)
-		EthernetPacket ether=new EthernetPacket();
-		//set frame type as IP
-		ether.frametype=EthernetPacket.ETHERTYPE_IP;
-		//set source and destination MAC addresses
-		ether.src_mac=new byte[]{(byte)0,(byte)1,(byte)2,(byte)3,(byte)4,(byte)5};
-		ether.dst_mac=new byte[]{(byte)0,(byte)6,(byte)7,(byte)8,(byte)9,(byte)10};
-
-		//set the datalink frame of the packet p as ether
-		p.datalink=ether;
-
-		//send the packet p
-		sender.sendPacket(p);
-
 		sender.close();
-	}
-
-}
-
-class PacketPrinter implements PacketReceiver {
-	  //this method is called every time Jpcap captures a packet
-	@Override
-	public void receivePacket(Packet arg0) {
-		//just print out a captured packet
-	    System.out.println(arg0);		
 	}
 }
