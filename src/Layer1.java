@@ -2,19 +2,18 @@ import jpcap.*;
 import jpcap.packet.*;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Layer1 {
+public class Layer1 extends Layer{
 	NetworkInterface[] devices;
 	JpcapCaptor captor;
 	JpcapSender sender;
 	ArrayList <Packet> misPaquetes=new ArrayList<Packet>();
 	int number;
 	
-	public void configuration() throws IOException {
+	public void configuration() {
 		//Obtain the list of network interfaces
 		devices = JpcapCaptor.getDeviceList();
 		//for each network interface
@@ -40,13 +39,17 @@ public class Layer1 {
 		Scanner input = new Scanner(System.in);
 		number = input.nextInt();
 		input.close();
-		//Open an interface with openDevice(NetworkInterface intrface, int snaplen, boolean promics, int to_ms)
-		captor=JpcapCaptor.openDevice(devices[number], 65535, true, 20); //boolean promics changed to true	
-		//open a network interface to send a packet to
-		sender=JpcapSender.openDevice(devices[number]);
+		try {
+			//open a network interface to send a packet to
+			captor=JpcapCaptor.openDevice(devices[number], 65535, true, 20); //boolean promics changed to true	
+			sender=JpcapSender.openDevice(devices[number]);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
-	public void run() throws UnknownHostException {
+	public void run() {
 		for(int i=0;i<10;i++) {
 			Packet p = captor.getPacket();
 			//capture a single packet that is different from null
