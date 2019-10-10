@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 public class Layer1 extends Layer{
 	NetworkInterface[] devices;
 	JpcapCaptor captor;
 	JpcapSender sender;
-	ArrayList <Packet> misPaquetes=new ArrayList<Packet>();
+	ArrayList <CustomPacket> misPaquetes=new ArrayList<CustomPacket>();
 	int number;
-	
+		
 	public void configuration() {
 		//Obtain the list of network interfaces
 		devices = JpcapCaptor.getDeviceList();
@@ -54,14 +53,18 @@ public class Layer1 extends Layer{
 			Packet p = captor.getPacket();
 			//capture a single packet that is different from null
 			while(p==null) p = captor.getPacket();
-			//store packet in an arraylist
-			misPaquetes.add(p);
+			CustomPacket cp=new CustomPacket(p, true);
+			up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
 		}
-		for(Packet f : misPaquetes) {
-			System.out.println(f);
-			sender.sendPacket(f);
+		for(int i=0;i<up.misPaquetes.size();i++) {
+			CustomPacket cp= misPaquetes.get(i);
+			if (cp.direction==false) {
+				Packet p=cp.packet;
+				sender.sendPacket(p);
+			}
 		}
 		captor.close();
 		sender.close();
 	}
+
 }
