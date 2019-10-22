@@ -1,28 +1,51 @@
-import java.util.ArrayList;
-
 import jpcap.packet.*;
 
 public class Layer2 extends Layer{
-	ArrayList <CustomPacket> misPaquetes=new ArrayList<CustomPacket>();
-	
+	EthernetPacket ep;
+	Packet p;
+	CustomPacket cp;
+	byte[] broadcastMAC = hexStringToByteArray("FFFFFFFFFFFF");
+	int number;
+
 	public void configuration() {
+		//Aquí se configura la MAC adress
+		for(int number=0;number<misPaquetes.size();number++) {
+			cp= misPaquetes.get(number);
+			if (cp.direction==true) {
+				p=cp.packet;
+				ep = (EthernetPacket) p.datalink;
+				ep.dst_mac = broadcastMAC; //Address to send this packet to all
+				ep.src_mac = ((Layer1)down).getMacAdress(); //My address (I’m the gossip)
+			}
+		}
 		
 	}
 
 	public void run() {
-		for(int i=0;i<down.misPaquetes.size();i++) {
-			CustomPacket cp= misPaquetes.get(i);
+		for(int number=0;number<misPaquetes.size();number++) {
 			if (cp.direction==true) {
-				Packet p=cp.packet;
-				EthernetPacket ep = (EthernetPacket) p.datalink;
-				ep.dst_mac = null; //Address to send this packet to all
-				ep.src_mac = null; //My address (I’m the gossip)
-				p.datalink = ep; // p is the new packet to send
-				down.misPaquetes.add(new CustomPacket(p, false));
+				try {
+					p.datalink = ep; // p is the new packet to send
+					down.miSemaforo.acquire();
+					down.misPaquetes.add(new CustomPacket(p, false));
+					down.miSemaforo.release();
+					misPaquetes.remove(number);
+					//set a filter to only capture TCP/IPv4 packets
+					//captor.setFilter("ip and tcp", true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		//set a filter to only capture TCP/IPv4 packets
-		//captor.setFilter("ip and tcp", true);
 	}
-
+	
+	public static byte[] hexStringToByteArray(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
+	}
 }

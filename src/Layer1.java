@@ -2,14 +2,12 @@ import jpcap.*;
 import jpcap.packet.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Layer1 extends Layer{
 	NetworkInterface[] devices;
 	JpcapCaptor captor;
 	JpcapSender sender;
-	ArrayList <CustomPacket> misPaquetes=new ArrayList<CustomPacket>();
 	int number;
 		
 	public void configuration() {
@@ -49,22 +47,34 @@ public class Layer1 extends Layer{
 	}
 	
 	public void run() {
-		for(int i=0;i<10;i++) {
-			Packet p = captor.getPacket();
-			//capture a single packet that is different from null
-			while(p==null) p = captor.getPacket();
-			CustomPacket cp=new CustomPacket(p, true);
-			up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
-		}
-		for(int i=0;i<up.misPaquetes.size();i++) {
-			CustomPacket cp= misPaquetes.get(i);
-			if (cp.direction==false) {
-				Packet p=cp.packet;
-				sender.sendPacket(p);
+		try {
+			for(int i=0;i<10;i++) {
+				Packet p = captor.getPacket();
+				//capture a single packet that is different from null
+				while(p==null) p = captor.getPacket();
+				CustomPacket cp=new CustomPacket(p, true);
+				up.miSemaforo.acquire();
+				up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
+				up.miSemaforo.release();
+				captor.close();
 			}
+			for(int i=0;i<misPaquetes.size();i++) {
+				//********************************Y los semáforos para enviar paquetes??
+				CustomPacket cp= misPaquetes.get(i);
+				if (cp.direction==false) {
+					Packet p=cp.packet;
+					sender.sendPacket(p);
+					misPaquetes.remove(i);
+				}
+				sender.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		captor.close();
-		sender.close();
+	}
+	
+	public byte[] getMacAdress() {
+		return devices[number].mac_address;
 	}
 
 }
