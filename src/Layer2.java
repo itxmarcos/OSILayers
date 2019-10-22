@@ -8,35 +8,32 @@ public class Layer2 extends Layer{
 	int number;
 
 	public void configuration() {
-		//Aquí se configura la MAC adress
+		//MAC adress configuration
 		for(int number=0;number<misPaquetes.size();number++) {
 			cp= misPaquetes.get(number);
 			if (cp.direction==true) {
 				p=cp.packet;
 				ep = (EthernetPacket) p.datalink;
 				ep.dst_mac = broadcastMAC; //Address to send this packet to all
-				ep.src_mac = ((Layer1)down).getMacAdress(); //My address (I’m the gossip)
+				ep.src_mac = ((Layer1)down).getMacAdress(); //My address
+				p.datalink = ep; // p is the new packet to send
 			}
 		}
-		
 	}
 
 	public void run() {
-		for(int number=0;number<misPaquetes.size();number++) {
-			if (cp.direction==true) {
-				try {
-					p.datalink = ep; // p is the new packet to send
-					down.miSemaforo.acquire();
-					down.misPaquetes.add(new CustomPacket(p, false));
-					down.miSemaforo.release();
-					misPaquetes.remove(number);
-					//set a filter to only capture TCP/IPv4 packets
-					//captor.setFilter("ip and tcp", true);
-				} catch (Exception e) {
-					e.printStackTrace();
+		try {
+				while(true) {
+				down.miSemaforo.acquire();
+				down.misPaquetes.add(new CustomPacket(p, false));
+				down.miSemaforo.release();
+				System.out.println("Packet sent Layer 1: \n"+misPaquetes.poll());
+				//set a filter to only capture TCP/IPv4 packets
+				//captor.setFilter("ip and tcp", true);
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		}
 	}
 	
 	public static byte[] hexStringToByteArray(String s) {

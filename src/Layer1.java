@@ -48,7 +48,7 @@ public class Layer1 extends Layer{
 	
 	public void run() {
 		try {
-			for(int i=0;i<10;i++) {
+			while(true) {
 				Packet p = captor.getPacket();
 				//capture a single packet that is different from null
 				while(p==null) p = captor.getPacket();
@@ -56,17 +56,17 @@ public class Layer1 extends Layer{
 				up.miSemaforo.acquire();
 				up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
 				up.miSemaforo.release();
-				captor.close();
-			}
-			for(int i=0;i<misPaquetes.size();i++) {
-				//********************************Y los semáforos para enviar paquetes??
-				CustomPacket cp= misPaquetes.get(i);
-				if (cp.direction==false) {
-					Packet p=cp.packet;
-					sender.sendPacket(p);
-					misPaquetes.remove(i);
-				}
+				captor.close();	
+				for(int i=0;i<misPaquetes.size();i++) {
+					CustomPacket cp2= misPaquetes.get(i);
+						Packet p2=cp2.packet;
+						System.out.println("Packet to the medium \n: "+p2);
+						down.miSemaforo.acquire();
+						sender.sendPacket(p2);
+						misPaquetes.poll();
+						down.miSemaforo.release();
 				sender.close();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -76,5 +76,4 @@ public class Layer1 extends Layer{
 	public byte[] getMacAdress() {
 		return devices[number].mac_address;
 	}
-
 }
