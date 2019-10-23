@@ -3,6 +3,7 @@ import java.io.IOException;
 public class Principal {
 
 	public static void main(String[] args) throws IOException {
+		
 		Layer1 miCapa1=new Layer1();
 		Layer2 miCapa2=new Layer2();
 		
@@ -10,6 +11,10 @@ public class Principal {
 		miCapa2.setNeighbors(miCapa1, null);
 		
 		miCapa1.configuration();
-		miCapa1.run();	
+		miCapa2.configuration();
+		
+		miCapa1.start();
+		miCapa2.start();
+		
 	}
 }

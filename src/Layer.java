@@ -15,4 +15,5 @@ public abstract class Layer extends Thread {
 		this.down = down;
 		this.up = up;
 	}
+	
 }
