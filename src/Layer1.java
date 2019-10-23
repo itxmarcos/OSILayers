@@ -56,21 +56,22 @@ public class Layer1 extends Layer{
 				
 				Packet p = captor.getPacket();
 				//capture a single packet that is different from null
-				while(p==null) p = captor.getPacket();
-				
-				CustomPacket cp=new CustomPacket(p, true);
-				up.miSemaforo.acquire();
-				up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
-				up.miSemaforo.release();
-				
-				miSemaforo.acquire();
-				cp = misPaquetes.poll();
-				miSemaforo.release();
-				if(cp!=null) {
-					sender.sendPacket(cp.packet);
-					System.out.println("Packet sent to the medium \n: "+cp.packet);
+				CustomPacket cp;
+				if(p==null) {
+					while(p==null) p = captor.getPacket();
+		
+					cp=new CustomPacket(p, true);
+					up.miSemaforo.acquire();
+					up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
+					up.miSemaforo.release();
 				}
-
+					miSemaforo.acquire();
+					cp = misPaquetes.poll();
+					miSemaforo.release();
+					if(cp!=null) {
+						sender.sendPacket(cp.packet);
+						System.out.println("Packet sent to the medium \n: "+cp.packet);
+					}
 			}
 
 		} catch (Exception e) {

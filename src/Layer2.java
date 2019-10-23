@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 import jpcap.packet.*;
 
 public class Layer2 extends Layer{
@@ -6,15 +8,43 @@ public class Layer2 extends Layer{
 	byte[] broadcastMAC = hexStringToByteArray("FFFFFFFFFFFF");
 
 	public void configuration() {
-		
-		// Solicitar (o coger) una MAC
-		this.sourceMAC = ((Layer1) down).getMacAdress();
-		
-		// Solicitar: scanner entrada, coger una cadena FF:AD:CA:19:42:C7, dividir, calcular bytes	
-		
-
+		try {
+			//Ask the user to use his own MAC address or another
+			int userRespond= 0;
+			System.out.println("\nTo use your own MAC press 1, to indroduce other MAC address press 2");
+			@SuppressWarnings("resource")
+			Scanner input = new Scanner(System.in);
+			userRespond= input.nextInt();
+	
+			if(userRespond==1) {
+				
+				this.sourceMAC = ((Layer1) down).getMacAdress();
+			}
+			else if(userRespond==2) {
+				
+				System.out.println("\nIntroduce the MAC address in Hexadecimal separate by ':' :");
+				@SuppressWarnings("resource")
+				Scanner input2 = new Scanner(System.in);
+				String stringAux = input2.next();
+				String[] parts = stringAux.split(":");
+				String part1 = parts[0]; 
+				String part2 = parts[1];
+				String part3 = parts[2];
+				String part4 = parts[3];
+				String part5 = parts[4];
+				String part6 = parts[5];
+				this.sourceMAC = hexStringToByteArray(parts.toString());
+				
+			}
+			else {
+				System.out.println("Invalid Respond");
+			}
+		}catch (ArrayIndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Invalid MAC Address");
+		}
 	}
-
 	public void run() {
 
 		try {
