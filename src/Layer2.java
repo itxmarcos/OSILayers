@@ -59,17 +59,23 @@ public class Layer2 extends Layer{
 					
 					Packet p = cpProcesado.packet;
 					EthernetPacket ep = (EthernetPacket) p.datalink;
-					ep.dst_mac = broadcastMAC;
-					ep.src_mac = sourceMAC;
-					p.datalink = ep;
-					cpProcesado.packet = p;
-					cpProcesado.direction = false;
+				//	ep.dst_mac = broadcastMAC;
+					if(ep.src_mac == sourceMAC || ep.src_mac== broadcastMAC) {
+						p.datalink = ep;
+						cpProcesado.packet = p;
+						cpProcesado.direction = true;
+					}
+					
+					up.miSemaforo.acquire();
+					up.misPaquetes.add(cpProcesado);
+					up.miSemaforo.release();
 
-
+					/*
 					down.miSemaforo.acquire();
 					down.misPaquetes.add(cpProcesado);
 					down.miSemaforo.release();
 					System.out.println("Packet sent to Layer 1: \n"+p);
+					*/
 				}
 				
 			}
