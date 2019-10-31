@@ -8,7 +8,8 @@ public class Layer1 extends Layer{
 	JpcapCaptor captor;
 	JpcapSender sender;
 	int number;
-		
+	Packet p;
+	
 	public void configuration() {
 		
 		//Obtain the list of network interfaces
@@ -53,13 +54,10 @@ public class Layer1 extends Layer{
 	public void run() {
 		try {
 			while(true) {
-				
-				Packet p = captor.getPacket();
+				while(p==null) p = captor.getPacket();
 				//capture a single packet that is different from null
 				CustomPacket cp;
-				if(p==null) {
-					while(p==null) p = captor.getPacket();
-		
+				if(p!=null) {		
 					cp=new CustomPacket(p, true);
 					up.miSemaforo.acquire();
 					up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
