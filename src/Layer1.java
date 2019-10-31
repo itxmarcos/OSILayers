@@ -44,7 +44,7 @@ public class Layer1 extends Layer{
 		try {
 			//open a network interface to send a packet to
 			captor=JpcapCaptor.openDevice(devices[number], 65535, true, 20); //boolean promics changed to true	
-			sender=JpcapSender.openDevice(devices[number]);
+			//sender=JpcapSender.openDevice(devices[number]);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,7 +54,11 @@ public class Layer1 extends Layer{
 	public void run() {
 		try {
 			while(true) {
+<<<<<<< HEAD
 				while(p==null) p = captor.getPacket();
+=======
+				Packet p = captor.getPacket();
+>>>>>>> bcf97b876f63288aa4e1c74ce5085350e2fef4a1
 				//capture a single packet that is different from null
 				CustomPacket cp;
 				if(p!=null) {		
@@ -66,12 +70,11 @@ public class Layer1 extends Layer{
 					miSemaforo.acquire();
 					cp = misPaquetes.poll();
 					miSemaforo.release();
-					if(cp!=null) {
+					/*if(cp!=null) {
 						sender.sendPacket(cp.packet);
 						System.out.println("Packet sent to the medium \n: "+cp.packet);
-					}
+					}*/
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
