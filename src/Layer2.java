@@ -49,8 +49,7 @@ public class Layer2 extends Layer{
 
 		try {
 
-			while(true) {
-
+			while(!endTime && !misPaquetes.isEmpty()) {
 				miSemaforo.acquire();
 				CustomPacket cpProcesado = misPaquetes.poll();
 				miSemaforo.release();
@@ -60,7 +59,7 @@ public class Layer2 extends Layer{
 					Packet p = cpProcesado.packet;
 					EthernetPacket ep = (EthernetPacket) p.datalink;
 				//	ep.dst_mac = broadcastMAC;
-					if(ep.src_mac == sourceMAC || ep.src_mac== broadcastMAC) {
+					if(ep.dst_mac == sourceMAC || ep.dst_mac== broadcastMAC) {
 						p.datalink = ep;
 						cpProcesado.packet = p;
 						cpProcesado.direction = true;
@@ -79,6 +78,7 @@ public class Layer2 extends Layer{
 				}
 				
 			}
+			up.endTime=true;
 			
 		} catch (Exception e) {
 			e.printStackTrace();

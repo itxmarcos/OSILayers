@@ -52,7 +52,7 @@ public class Layer1 extends Layer{
 	
 	public void run() {
 		try {
-			while(true) {
+			while(!endTime) {
 				Packet p = captor.getPacket();
 				//capture a single packet that is different from null
 				CustomPacket cp;
@@ -72,6 +72,7 @@ public class Layer1 extends Layer{
 						System.out.println("Packet sent to the medium \n: "+cp.packet);
 					}*/
 			}
+			up.endTime=true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
