@@ -6,6 +6,7 @@ public abstract class Layer extends Thread {
 	public Layer up;
 	public Layer down;
 	Semaphore miSemaforo=new Semaphore(1); //Only one access per element.
+	public boolean endTime;
 	
 	public abstract void configuration();
 	@Override
