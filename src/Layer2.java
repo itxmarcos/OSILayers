@@ -60,7 +60,11 @@ public class Layer2 extends Layer{
 					EthernetPacket ep = (EthernetPacket) p.datalink;
 				//	ep.dst_mac = broadcastMAC;
 					if(ep.dst_mac == sourceMAC || ep.dst_mac== broadcastMAC) {
+<<<<<<< HEAD
 						p.datalink = ep;
+=======
+				//		p.datalink = ep;
+>>>>>>> c2b8354376720865637ea2cba2b20646ff1c9e9e
 						cpProcesado.packet = p;
 						cpProcesado.direction = true;
 					}
