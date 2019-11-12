@@ -1,12 +1,10 @@
-import java.util.ArrayList;
 
-import jpcap.packet.ARPPacket;
+//import jpcap.packet.ARPPacket;
 import jpcap.packet.EthernetPacket;
-import jpcap.packet.IPPacket;
+//import jpcap.packet.IPPacket;
 import jpcap.packet.Packet;
 
 public class Layer3 extends Layer{
-	ArrayList <Protocol> misProtocolos=new ArrayList<Protocol>();
 	Packet p;
 	int type;
 	EthernetPacket ep;
@@ -29,14 +27,24 @@ public class Layer3 extends Layer{
 				type = ep.frametype;
 				
 				if(type==EthernetPacket.ETHERTYPE_ARP) {
-					ARPPacket arpPacket =(ARPPacket) p;
+				//	ARPPacket arpPacket =(ARPPacket) p;
+					ARP ARPProtocol = new ARP();
+					ARP.miSemaforo.acquire();
+					ARP.misProtocolos.add(ARPProtocol);
+					ARP.miSemaforo.release();
 				}
 				else if(type==EthernetPacket.ETHERTYPE_IP) {
-					IPPacket ipPacket =(IPPacket) p;
+				//	IPPacket ipPacket =(IPPacket) p;
+					Ipv4 IPV4Protocol = new Ipv4();
+					IPV.miSemaforo.acquire();
+					IPV.misProtocolos.add(IPV4Protocol);
+					IPV.miSemaforo.release();
 				} else {
 					System.out.println("\nThe packet cannot be processed");
 				}
 			}
+			ARP.endTime=true;
+			IPV.endTime=true;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
