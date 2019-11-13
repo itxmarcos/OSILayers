@@ -14,12 +14,15 @@ public class Principal {
 			miCapa1.setLayersNeighbors(null, miCapa2);
 			miCapa2.setLayersNeighbors(miCapa1, miCapa3);
 			miCapa3.setLayersNeighbors(miCapa2, null);
-			miCapa3.setProtocolLinked(ARPProtocol, IPVProtocol);
+
+			miCapa3.ARP = ARPProtocol;
+			miCapa3.IPV = IPVProtocol;
 			
 			miCapa1.configuration();
 			miCapa2.configuration();
 			miCapa3.configuration();
-			
+			IPVProtocol.configuration();
+			ARPProtocol.configuration();
 			
 			miCapa1.start();
 			miCapa2.start();
@@ -27,7 +30,10 @@ public class Principal {
 			IPVProtocol.start();
 			ARPProtocol.start();
 			
-			Thread.sleep(200);
+			Thread.sleep(20000);
+			
+			miCapa1.endTime = true;
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

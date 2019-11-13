@@ -1,17 +1,19 @@
+import jpcap.packet.IPPacket;
 
 public class Ipv4 extends Protocol {
 	@Override
 	public void configuration() {
-		
+		endTime = false;
 	}
 	@Override
 	public void run() {
 		try {
-			while(!endTime && !misProtocolos.isEmpty()) {
-			miSemaforo.acquire();
-			Protocol ProtocoloProcesado = misProtocolos.poll();
-			miSemaforo.release();
-			System.out.println("El Protocolo Ipv4 ha sido procesado: \n"+ProtocoloProcesado+"\n");
+			while(!endTime || !misPaquetes.isEmpty()) {
+				miSemaforo.acquire();
+				CustomPacket paquete = misPaquetes.poll();
+				miSemaforo.release();
+				
+				if(paquete != null)	System.out.println("El paquete p ha sido procesado: "+ (IPPacket) paquete.packet);
 			}
 		}
 		catch (Exception e) {

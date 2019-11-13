@@ -9,6 +9,9 @@ public class Layer2 extends Layer{
 
 	public void configuration() {
 		try {
+			
+			endTime = false;
+			
 			//Ask the user to use his own MAC address or another
 			int userRespond= 0;
 			System.out.println("\nTo use your own MAC press 1, to indroduce other MAC address press 2");
@@ -17,7 +20,6 @@ public class Layer2 extends Layer{
 			userRespond= input.nextInt();
 	
 			if(userRespond==1) {
-				
 				this.sourceMAC = ((Layer1) down).getMacAdress();
 			}
 			else if(userRespond==2) {
@@ -49,32 +51,24 @@ public class Layer2 extends Layer{
 
 		try {
 
-			while(!endTime && !misPaquetes.isEmpty()) {
+			while(!endTime || !misPaquetes.isEmpty()) {
+				
 				miSemaforo.acquire();
-				CustomPacket cpProcesado = misPaquetes.poll();
+				CustomPacket cp = misPaquetes.poll();
 				miSemaforo.release();
 
-				if(cpProcesado!=null) {
+				if(cp != null) {
 					
-					Packet p = cpProcesado.packet;
+					Packet p = cp.packet;
 					EthernetPacket ep = (EthernetPacket) p.datalink;
-				//	ep.dst_mac = broadcastMAC;
-					if(ep.dst_mac == sourceMAC || ep.dst_mac== broadcastMAC) {
-				//		p.datalink = ep;
-						cpProcesado.packet = p;
-						cpProcesado.direction = true;
+					if(compareMACs(ep.dst_mac)) {
+						
+						up.miSemaforo.acquire();
+						up.misPaquetes.add(cp);
+						up.miSemaforo.release();
+						
+						System.out.println("Mando paquete a L3");
 					}
-					
-					up.miSemaforo.acquire();
-					up.misPaquetes.add(cpProcesado);
-					up.miSemaforo.release();
-
-					/*
-					down.miSemaforo.acquire();
-					down.misPaquetes.add(cpProcesado);
-					down.miSemaforo.release();
-					System.out.println("Packet sent to Layer 1: \n"+p);
-					*/
 				}
 				
 			}
@@ -93,5 +87,26 @@ public class Layer2 extends Layer{
 	                             + Character.digit(s.charAt(i+1), 16));
 	    }
 	    return data;
+	}
+	
+	public boolean compareMACs(byte[] dst_mac) {
+		
+		boolean condition = false;
+		
+		if(dst_mac[0] == sourceMAC[0] &&
+				dst_mac[1] == sourceMAC[1] &&
+				dst_mac[2] == sourceMAC[2] &&
+				dst_mac[3] == sourceMAC[3] &&
+				dst_mac[4] == sourceMAC[4] &&
+				dst_mac[5] == sourceMAC[5]) condition = true;
+		
+		if(dst_mac[0] == broadcastMAC[0] &&
+				dst_mac[1] == broadcastMAC[1] &&
+				dst_mac[2] == broadcastMAC[2] &&
+				dst_mac[3] == broadcastMAC[3] &&
+				dst_mac[4] == broadcastMAC[4] &&
+				dst_mac[5] == broadcastMAC[5]) condition = true;
+		
+		return condition;
 	}
 }

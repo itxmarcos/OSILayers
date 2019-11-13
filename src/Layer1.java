@@ -11,6 +11,8 @@ public class Layer1 extends Layer{
 		
 	public void configuration() {
 		
+		endTime = false;
+		
 		//Obtain the list of network interfaces
 		devices = JpcapCaptor.getDeviceList();
 		
@@ -55,22 +57,14 @@ public class Layer1 extends Layer{
 			while(!endTime) {
 				Packet p = captor.getPacket();
 				//capture a single packet that is different from null
-				CustomPacket cp;
-				if(p==null) {
-					while(p==null) p = captor.getPacket();
-		
-					cp=new CustomPacket(p, true);
+				if(p!=null) {
+					CustomPacket cp = new CustomPacket(p, true);
 					up.miSemaforo.acquire();
 					up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
 					up.miSemaforo.release();
+					
+					System.out.println("Packet sent to L2");
 				}
-					miSemaforo.acquire();
-					cp = misPaquetes.poll();
-					miSemaforo.release();
-					/*if(cp!=null) {
-						sender.sendPacket(cp.packet);
-						System.out.println("Packet sent to the medium \n: "+cp.packet);
-					}*/
 			}
 			up.endTime=true;
 		} catch (Exception e) {

@@ -1,3 +1,5 @@
+import jpcap.packet.ARPPacket;
+
 //import java.util.HashMap;
 //import java.util.Map;
 
@@ -6,16 +8,17 @@ public class ARP extends Protocol{
     //Map<String, Integer> numberMapping = new HashMap<>(); //Esto se encargaría de traducir de IP a MAC
 	@Override
 	public void configuration() {
-			
+		endTime = false;
 	}
 	@Override
 	public void run() {
 		try {
-		while(!endTime && !misProtocolos.isEmpty()) {
+		while(!endTime || !misPaquetes.isEmpty()) {
 			miSemaforo.acquire();
-			Protocol ProtocoloProcesado = misProtocolos.poll();
+			CustomPacket paquete = misPaquetes.poll();
 			miSemaforo.release();
-			System.out.println("El Protocolo ARP ha sido procesado: \n"+ProtocoloProcesado+"\n");
+			
+			if(paquete != null)	System.out.println("El paquete p ha sido procesado: "+ (ARPPacket) paquete.packet);
 			}
 		}
 		catch (Exception e) {

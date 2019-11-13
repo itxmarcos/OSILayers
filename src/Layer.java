@@ -5,8 +5,7 @@ public abstract class Layer extends Thread {
 	LinkedList <CustomPacket> misPaquetes=new LinkedList<CustomPacket>();
 	public Layer up;
 	public Layer down;
-	public Protocol ARP;
-	public Protocol IPV;
+
 	Semaphore miSemaforo=new Semaphore(1); //Only one access per element.
 	public boolean endTime;
 	
@@ -17,9 +16,5 @@ public abstract class Layer extends Thread {
 	public void setLayersNeighbors(Layer down, Layer up) {
 		this.down = down;
 		this.up = up;
-	}
-	public void setProtocolLinked(Protocol ARP, Protocol IPV) {
-		this.ARP= ARP;
-		this.IPV= IPV;
 	}
 }
