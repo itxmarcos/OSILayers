@@ -1,7 +1,10 @@
+package Layers;
 import jpcap.*;
 import jpcap.packet.*;
 
 import java.util.Scanner;
+
+import CustomPacket.CustomPacket;
 
 public class Layer1 extends Layer{
 	NetworkInterface[] devices;

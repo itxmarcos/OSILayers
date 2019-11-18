@@ -1,5 +1,8 @@
+package Layers;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
+
+import CustomPacket.CustomPacket;
 
 public abstract class Layer extends Thread {
 	LinkedList <CustomPacket> misPaquetes=new LinkedList<CustomPacket>();

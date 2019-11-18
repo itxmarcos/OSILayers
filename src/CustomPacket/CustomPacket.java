@@ -1,7 +1,8 @@
+package CustomPacket;
 import jpcap.packet.Packet;
 
 public class CustomPacket {
-	Packet packet;
+	public Packet packet;
 	boolean direction;
 	
 	public CustomPacket(Packet p, boolean dir) {

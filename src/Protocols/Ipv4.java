@@ -1,3 +1,5 @@
+package Protocols;
+import CustomPacket.CustomPacket;
 import jpcap.packet.IPPacket;
 
 public class Ipv4 extends Protocol {
