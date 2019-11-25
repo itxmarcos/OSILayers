@@ -1,7 +1,5 @@
-package Layers;
 import java.util.Scanner;
 
-import CustomPacket.CustomPacket;
 import jpcap.packet.*;
 
 public class Layer2 extends Layer{
@@ -69,7 +67,7 @@ public class Layer2 extends Layer{
 						up.misPaquetes.add(cp);
 						up.miSemaforo.release();
 						
-						System.out.println("Mando paquete a L3");
+						System.out.println("Packet sent to L3");
 					}
 				}
 				

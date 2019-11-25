@@ -1,5 +1,3 @@
-package Protocols;
-import CustomPacket.CustomPacket;
 import jpcap.packet.IPPacket;
 
 public class Ipv4 extends Protocol {
@@ -15,7 +13,7 @@ public class Ipv4 extends Protocol {
 				CustomPacket paquete = misPaquetes.poll();
 				miSemaforo.release();
 				
-				if(paquete != null)	System.out.println("El paquete p ha sido procesado: "+ (IPPacket) paquete.packet);
+				if(paquete != null)	System.out.println("IPV4 packet processed: "+ (IPPacket) paquete.packet);
 			}
 		}
 		catch (Exception e) {

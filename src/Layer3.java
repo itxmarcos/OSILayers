@@ -1,7 +1,5 @@
-package Layers;
 
-import CustomPacket.CustomPacket;
-import Protocols.Protocol;
+//import jpcap.packet.ARPPacket;
 import jpcap.packet.EthernetPacket;
 //import jpcap.packet.IPPacket;
 import jpcap.packet.Packet;
@@ -58,6 +56,5 @@ public class Layer3 extends Layer{
 			e.printStackTrace();
 		}
 	}
-
 }
 
