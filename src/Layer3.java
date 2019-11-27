@@ -15,6 +15,7 @@ public class Layer3 extends Layer{
 	@Override
 	public void configuration() {
 		endTime = false;
+		//Aquí habría que pedirle la IP al usuario y pasarla a ARP
 	}
 
 	@Override
@@ -26,35 +27,41 @@ public class Layer3 extends Layer{
 				miSemaforo.release();
 				
 				if(cpProcesado != null) {
-					p = cpProcesado.packet;
-					ep = (EthernetPacket) p.datalink;
-					type = ep.frametype;
+					if(cpProcesado.direction==true){
+						p = cpProcesado.packet;
+						ep = (EthernetPacket) p.datalink;
+						type = ep.frametype;
 
-					if(type==EthernetPacket.ETHERTYPE_ARP) {
+						if(type==EthernetPacket.ETHERTYPE_ARP) {
 
-						ARP.miSemaforo.acquire();
-						ARP.misPaquetes.add(cpProcesado);
-						ARP.miSemaforo.release();
-						
-						System.out.println("Packet sent to ARP");
+							ARP.miSemaforo.acquire();
+							ARP.misPaquetes.add(cpProcesado);
+							ARP.miSemaforo.release();
+							
+							System.out.println("Packet sent to ARP");
+						}
+						else if(type==EthernetPacket.ETHERTYPE_IP) {
+							IPV.miSemaforo.acquire();
+							IPV.misPaquetes.add(cpProcesado);
+							IPV.miSemaforo.release();
+							
+							System.out.println("Packet sent to IPV");
+						} else {
+							System.out.println("The packet cannot be processed");
+						}
 					}
-					else if(type==EthernetPacket.ETHERTYPE_IP) {
-						IPV.miSemaforo.acquire();
-						IPV.misPaquetes.add(cpProcesado);
-						IPV.miSemaforo.release();
-						
-						System.out.println("Packet sent to IPV");
-					} else {
-						System.out.println("The packet cannot be processed");
+					else{
+						down.miSemaforo.acquire();
+						down.misPaquetes.add(cpProcesado);
+						down.miSemaforo.release();
+						System.out.println("Packet sent to Layer 2");
 					}
 				}
 			}
 			ARP.endTime=true;
 			IPV.endTime=true;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 }
-

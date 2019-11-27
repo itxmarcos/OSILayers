@@ -58,16 +58,23 @@ public class Layer2 extends Layer{
 				miSemaforo.release();
 
 				if(cp != null) {
-					
-					Packet p = cp.packet;
-					EthernetPacket ep = (EthernetPacket) p.datalink;
-					if(compareMACs(ep.dst_mac)) {
-						
-						up.miSemaforo.acquire();
-						up.misPaquetes.add(cp);
-						up.miSemaforo.release();
-						
-						System.out.println("Packet sent to L3");
+					if(cp.direction==true){
+						Packet p = cp.packet;
+						EthernetPacket ep = (EthernetPacket) p.datalink;
+						if(compareMACs(ep.dst_mac)) {
+							
+							up.miSemaforo.acquire();
+							up.misPaquetes.add(cp);
+							up.miSemaforo.release();
+							
+							System.out.println("Packet sent to L3");
+						}
+					}
+					else{
+						down.miSemaforo.acquire();
+						down.misPaquetes.add(cp);
+						down.miSemaforo.release();
+						System.out.println("Packet sent to L1");
 					}
 				}
 				
