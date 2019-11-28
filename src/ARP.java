@@ -1,15 +1,13 @@
 import jpcap.packet.ARPPacket;
 import jpcap.packet.EthernetPacket;
-//import jpcap.packet.Packet;
-import jpcap.packet.IPPacket;
+import jpcap.packet.Packet;
 
-import java.util.HashMap;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Map;
 
 public class ARP extends Protocol{
-    public Map<String, Integer> numberMapping = new HashMap<>();
-    public Layer miCapa;
-    @Override
+    //Map<String, Integer> numberMapping = new HashMap<>(); //Esto se encargaria de traducir de IP a MAC
+	@Override
 	public void configuration() {
 		endTime = false;
 	}
@@ -23,24 +21,20 @@ public class ARP extends Protocol{
 			
 				if(paquete != null)	{
 					ARPPacket ap= (ARPPacket)paquete.packet;
-				//	EthernetPacket ep = (EthernetPacket) ap.datalink;
-					IPPacket ipPA= new IPPacket();
-					if(ap.operation==ARPPacket.ARP_REQUEST) {
-						ARPPacket arp = new ARPPacket();
-						EthernetPacket e = (EthernetPacket) arp.datalink;
-						arp.hardtype = ARPPacket.HARDTYPE_ETHER;
-						arp.prototype = ARPPacket.PROTOTYPE_IP;
-						arp.hlen =(short) e.src_mac.length;
-		//				arp.plen =ipPA.src_ip.;
-						arp.sender_hardaddr = e.src_mac;
-						//arp.sender_protoaddr = a.src_ip;
-						arp.target_hardaddr = hexStringToByteArray("000000000000");
-						//arp.target_protoaddr = destination_ip_address;
-						arp.operation=ARPPacket.ARP_REPLY;
+					EthernetPacket ep = (EthernetPacket) ap.datalink;
+					if(compareMACs(ap.target_hardaddr)) {
+						ARPPacket a = new ARPPacket();
+						EthernetPacket e = (EthernetPacket) a.datalink;
+						a.hardtype = ARPPacket.HARDTYPE_ETHER;
+						a.prototype = ARPPacket.PROTOTYPE_IP;
+						a.hlen =(short) e.src_mac.length;
+						//a.plen = IP.IP_LENGTH;
+						a.sender_hardaddr = e.src_mac;
+						//a.sender_protoaddr = a.src_ip;
+						a.target_hardaddr = hexStringToByteArray("000000000000");
+						//a.target_protoaddr = destination_ip_address;
 					}
-					else if(ap.operation==ARPPacket.ARP_REPLY){
-						
-					}
+					//System.out.println("ARP packet processed: "+ (ARPPacket) paquete.packet);
 				}
 			}
 		}
@@ -49,7 +43,7 @@ public class ARP extends Protocol{
 			e.printStackTrace();
 		}
 	}
-/*	public boolean compareMACs(byte[] mac_addr) {	
+	public boolean compareMACs(byte[] mac_addr) {	
 		boolean condition = false;
 		if(mac_addr[0] == 0 &&
 				mac_addr[1] == 0 &&
@@ -59,7 +53,6 @@ public class ARP extends Protocol{
 				mac_addr[5] == 0) condition = true;
 		return condition;
 	}
-*/	
 	public static byte[] hexStringToByteArray(String s) {
 	    int len = s.length();
 	    byte[] data = new byte[len / 2];

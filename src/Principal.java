@@ -8,8 +8,8 @@ public class Principal {
 			Layer2 miCapa2=new Layer2();
 			Layer3 miCapa3=new Layer3();
 			
-			Ipv4 IPVProtocol= new Ipv4();
-			ARP ARPProtocol= new ARP();
+			Protocol IPVProtocol= new Ipv4();
+			Protocol ARPProtocol= new ARP();
 			
 			miCapa1.setLayersNeighbors(null, miCapa2);
 			miCapa2.setLayersNeighbors(miCapa1, miCapa3);
@@ -17,8 +17,6 @@ public class Principal {
 
 			miCapa3.ARP = ARPProtocol;
 			miCapa3.IPV = IPVProtocol;
-			
-			ARPProtocol.miCapa=miCapa3;
 			
 			miCapa1.configuration();
 			miCapa2.configuration();

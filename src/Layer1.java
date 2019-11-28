@@ -1,7 +1,6 @@
 import jpcap.*;
 import jpcap.packet.*;
 
-import java.net.InetAddress;
 import java.util.Scanner;
 
 public class Layer1 extends Layer{
@@ -9,7 +8,6 @@ public class Layer1 extends Layer{
 	JpcapCaptor captor;
 	JpcapSender sender;
 	int number;
-
 		
 	public void configuration() {
 		
