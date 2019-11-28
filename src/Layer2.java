@@ -70,10 +70,11 @@ public class Layer2 extends Layer{
 							System.out.println("Packet sent to L3");
 						}
 					}
-					else{
+					else{//Meter MAC destino
 						down.miSemaforo.acquire();
 						down.misPaquetes.add(cp);
 						down.miSemaforo.release();
+						//Paquete poner nuestra source mad de source y la suya de destino
 						System.out.println("Packet sent to L1");
 					}
 				}
