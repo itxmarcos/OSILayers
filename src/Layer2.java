@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 
 import jpcap.packet.*;
@@ -56,13 +57,13 @@ public class Layer2 extends Layer{
 				miSemaforo.acquire();
 				CustomPacket cp = misPaquetes.poll();
 				miSemaforo.release();
-
+				Packet p = cp.packet;
+				EthernetPacket ep = (EthernetPacket) p.datalink;
+				
 				if(cp != null) {
 					if(cp.direction==true){
-						Packet p = cp.packet;
-						EthernetPacket ep = (EthernetPacket) p.datalink;
-						if(compareMACs(ep.dst_mac)) {
-							
+						if(compareSourceBroadcastMACs(ep.dst_mac)) {
+							ep.src_mac=sourceMAC;
 							up.miSemaforo.acquire();
 							up.misPaquetes.add(cp);
 							up.miSemaforo.release();
@@ -71,6 +72,13 @@ public class Layer2 extends Layer{
 						}
 					}
 					else{
+						ARPPacket ap= (ARPPacket) p;
+						if(compareZeros(ap.target_hardaddr)) {
+							ep.dst_mac=broadcastMAC;
+						}
+						else {
+							ep.dst_mac=ap.target_hardaddr;
+						}
 						down.miSemaforo.acquire();
 						down.misPaquetes.add(cp);
 						down.miSemaforo.release();
@@ -96,7 +104,7 @@ public class Layer2 extends Layer{
 	    return data;
 	}
 	
-	public boolean compareMACs(byte[] dst_mac) {
+	public boolean compareSourceBroadcastMACs(byte[] dst_mac) {
 		
 		boolean condition = false;
 		
@@ -114,6 +122,19 @@ public class Layer2 extends Layer{
 				dst_mac[4] == broadcastMAC[4] &&
 				dst_mac[5] == broadcastMAC[5]) condition = true;
 		
+		return condition;
+	}
+	public boolean compareZeros(byte[] mac) {
+		
+		boolean condition = false;
+		
+		if(mac[0] == 0 &&
+				mac[1] == 1 &&
+				mac[2] == 0 &&
+				mac[3] == 0 &&
+				mac[4] == 0 &&
+				mac[5] == 0) condition = true;
+	
 		return condition;
 	}
 }

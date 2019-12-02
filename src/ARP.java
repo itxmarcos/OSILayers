@@ -1,13 +1,16 @@
 import jpcap.packet.ARPPacket;
 import jpcap.packet.EthernetPacket;
-import jpcap.packet.Packet;
 
-//import java.util.HashMap;
-//import java.util.Map;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ARP extends Protocol{
-    //Map<String, Integer> numberMapping = new HashMap<>(); //Esto se encargaria de traducir de IP a MAC
-	@Override
+    public Map<byte[], byte[]> translatorIPtoMAC = new HashMap<>();
+    public Layer miCapa;
+    byte[] sourceIP;
+    byte[] broadcastIP = hexStringToByteArray("FFFFFFFF"); //255.255.255.255
+   
+    @Override
 	public void configuration() {
 		endTime = false;
 	}
@@ -22,36 +25,56 @@ public class ARP extends Protocol{
 				if(paquete != null)	{
 					ARPPacket ap= (ARPPacket)paquete.packet;
 					EthernetPacket ep = (EthernetPacket) ap.datalink;
-					if(compareMACs(ap.target_hardaddr)) {
-						ARPPacket a = new ARPPacket();
-						EthernetPacket e = (EthernetPacket) a.datalink;
-						a.hardtype = ARPPacket.HARDTYPE_ETHER;
-						a.prototype = ARPPacket.PROTOTYPE_IP;
-						a.hlen =(short) e.src_mac.length;
-						//a.plen = IP.IP_LENGTH;
-						a.sender_hardaddr = e.src_mac;
-						//a.sender_protoaddr = a.src_ip;
-						a.target_hardaddr = hexStringToByteArray("000000000000");
-						//a.target_protoaddr = destination_ip_address;
+					if(ap.operation==ARPPacket.ARP_REQUEST) { //Hacer paquete de replay
+						ARPPacket arp = new ARPPacket();
+						EthernetPacket e = (EthernetPacket) arp.datalink;
+						arp.hardtype = ARPPacket.HARDTYPE_ETHER;
+						arp.prototype = ARPPacket.PROTOTYPE_IP;
+						arp.hlen =(short) e.src_mac.length;
+						arp.plen =(short) sourceIP.length;
+						arp.sender_hardaddr = e.src_mac;
+						arp.sender_protoaddr = sourceIP;
+						arp.target_hardaddr = hexStringToByteArray("000000000000");
+						arp.target_protoaddr = ap.sender_protoaddr;
+						arp.operation=ARPPacket.ARP_REPLY;
 					}
-					//System.out.println("ARP packet processed: "+ (ARPPacket) paquete.packet);
+					else if(ap.operation==ARPPacket.ARP_REPLY){
+						translatorIPtoMAC.put(ap.sender_protoaddr,ep.src_mac);
+					}
 				}
 			}
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public boolean compareMACs(byte[] mac_addr) {	
-		boolean condition = false;
-		if(mac_addr[0] == 0 &&
-				mac_addr[1] == 0 &&
-				mac_addr[2] == 0 &&
-				mac_addr[3] == 0 &&
-				mac_addr[4] == 0 &&
-				mac_addr[5] == 0) condition = true;
-		return condition;
+	public void Translator(byte[] IPtranslate) {
+		if(translatorIPtoMAC.containsKey(IPtranslate)) {
+			System.out.println("The MAC address that you are looking for is: "+translatorIPtoMAC.get(IPtranslate));
+		}
+		else {
+			try {
+				ARPPacket arpProcesado = new ARPPacket();
+				EthernetPacket e = (EthernetPacket) arpProcesado.datalink;
+				arpProcesado.hardtype = ARPPacket.HARDTYPE_ETHER;
+				arpProcesado.prototype = ARPPacket.PROTOTYPE_IP;
+				arpProcesado.hlen =(short) e.src_mac.length;
+				arpProcesado.plen =(short) sourceIP.length;
+				arpProcesado.sender_hardaddr = e.src_mac;
+				arpProcesado.sender_protoaddr = sourceIP;
+				arpProcesado.target_hardaddr = hexStringToByteArray("000000000000");
+				arpProcesado.target_protoaddr = broadcastIP;
+				arpProcesado.operation=ARPPacket.ARP_REQUEST;
+				CustomPacket cpProcesado = new CustomPacket(arpProcesado,false);
+				miCapa.miSemaforo.acquire();
+				miCapa.misPaquetes.add(cpProcesado);
+				miCapa.miSemaforo.release();
+				System.out.println("Awaiting destination response. Please wait...");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	public static byte[] hexStringToByteArray(String s) {
 	    int len = s.length();
@@ -61,5 +84,8 @@ public class ARP extends Protocol{
 	                             + Character.digit(s.charAt(i+1), 16));
 	    }
 	    return data;
+	}
+	public byte[] getIPUser() {
+		return Principal.userIP;
 	}
 }

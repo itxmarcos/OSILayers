@@ -1,3 +1,4 @@
+
 import jpcap.*;
 import jpcap.packet.*;
 
@@ -8,6 +9,7 @@ public class Layer1 extends Layer{
 	JpcapCaptor captor;
 	JpcapSender sender;
 	int number;
+
 		
 	public void configuration() {
 		
