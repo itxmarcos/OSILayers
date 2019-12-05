@@ -66,7 +66,7 @@ public class Layer1 extends Layer{
 					up.misPaquetes.add(cp); //store packet in Layer 2 arraylist
 					up.miSemaforo.release();
 					
-					System.out.println("Packet sent to L2");
+					//System.out.println("Packet sent to L2");
 				}
 
 				miSemaforo.acquire();
@@ -74,7 +74,7 @@ public class Layer1 extends Layer{
 				miSemaforo.release();
 				if(cp!=null){
 					sender.sendPacket(cp.packet);
-					System.out.println("Packet sent to the medium \n: "+cp.packet);
+					//System.out.println("Packet sent to the medium \n: "+cp.packet);
 				}
 			}
 			up.endTime=true;

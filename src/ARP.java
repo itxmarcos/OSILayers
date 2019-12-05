@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ARP extends Protocol{
-    public Map<byte[], byte[]> translatorIPtoMAC = new HashMap<>();
-    public Layer miCapa;
-    byte[] sourceIP;
+    
+	public Map<byte[], byte[]> arpTable = new HashMap<>();
     byte[] broadcastIP = hexStringToByteArray("FFFFFFFF"); //255.255.255.255
    
     @Override
@@ -17,29 +16,35 @@ public class ARP extends Protocol{
 	@Override
 	public void run() {
 		try {
+			
 			while(!endTime || !misPaquetes.isEmpty()) {
+				
 				miSemaforo.acquire();
 				CustomPacket paquete = misPaquetes.poll();
 				miSemaforo.release();
 			
 				if(paquete != null)	{
-					ARPPacket ap= (ARPPacket)paquete.packet;
+					
+					ARPPacket ap = (ARPPacket) paquete.packet;
 					EthernetPacket ep = (EthernetPacket) ap.datalink;
-					if(ap.operation==ARPPacket.ARP_REQUEST) { //Hacer paquete de replay
+					
+					if(ap.operation == ARPPacket.ARP_REQUEST) { //Hacer paquete de reply
 						ARPPacket arp = new ARPPacket();
-						EthernetPacket e = (EthernetPacket) arp.datalink;
+						
 						arp.hardtype = ARPPacket.HARDTYPE_ETHER;
 						arp.prototype = ARPPacket.PROTOTYPE_IP;
-						arp.hlen =(short) e.src_mac.length;
-						arp.plen =(short) sourceIP.length;
-						arp.sender_hardaddr = e.src_mac;
-						arp.sender_protoaddr = sourceIP;
-						arp.target_hardaddr = hexStringToByteArray("000000000000");
+						arp.hlen = 6;
+						arp.plen = 4;
+						arp.sender_hardaddr = ((Layer2) ((Layer3) miCapa).down).sourceMAC;
+						arp.sender_protoaddr = ((Layer3) miCapa).sourceIP;
+						arp.target_hardaddr = ap.sender_hardaddr;
 						arp.target_protoaddr = ap.sender_protoaddr;
 						arp.operation=ARPPacket.ARP_REPLY;
 					}
-					else if(ap.operation==ARPPacket.ARP_REPLY){
-						translatorIPtoMAC.put(ap.sender_protoaddr,ep.src_mac);
+					else if(ap.operation == ARPPacket.ARP_REPLY){
+						miSemaforo.acquire();
+						arpTable.put(ap.sender_protoaddr,ep.src_mac);
+						miSemaforo.release();
 					}
 				}
 			}
@@ -48,32 +53,36 @@ public class ARP extends Protocol{
 			e.printStackTrace();
 		}
 	}
-	public void Translator(byte[] IPtranslate) {
-		if(translatorIPtoMAC.containsKey(IPtranslate)) {
-			System.out.println("The MAC address that you are looking for is: "+translatorIPtoMAC.get(IPtranslate));
-		}
-		else {
-			try {
-				ARPPacket arpProcesado = new ARPPacket();
-				EthernetPacket e = (EthernetPacket) arpProcesado.datalink;
-				arpProcesado.hardtype = ARPPacket.HARDTYPE_ETHER;
-				arpProcesado.prototype = ARPPacket.PROTOTYPE_IP;
-				arpProcesado.hlen =(short) e.src_mac.length;
-				arpProcesado.plen =(short) sourceIP.length;
-				arpProcesado.sender_hardaddr = e.src_mac;
-				arpProcesado.sender_protoaddr = sourceIP;
-				arpProcesado.target_hardaddr = hexStringToByteArray("000000000000");
-				arpProcesado.target_protoaddr = broadcastIP;
-				arpProcesado.operation=ARPPacket.ARP_REQUEST;
-				CustomPacket cpProcesado = new CustomPacket(arpProcesado,false);
+	
+	
+	public void translator(byte[] IPtranslate) {
+		try {
+			if(arpTable.containsKey(IPtranslate)) {
+				miSemaforo.acquire();
+				System.out.println("The MAC address that you are looking for is: " + arpTable.get(IPtranslate));
+				miSemaforo.release();
+				}
+				
+			else {
+				ARPPacket arpRequest = new ARPPacket();
+				arpRequest.hardtype = ARPPacket.HARDTYPE_ETHER;
+				arpRequest.prototype = ARPPacket.PROTOTYPE_IP;
+				arpRequest.hlen = 6;
+				arpRequest.plen = 4;
+				arpRequest.sender_hardaddr = ((Layer2) ((Layer3) miCapa).down).sourceMAC;
+				arpRequest.sender_protoaddr = ((Layer3) miCapa).sourceIP;
+				arpRequest.target_hardaddr = hexStringToByteArray("000000000000");
+				arpRequest.target_protoaddr = broadcastIP;
+				arpRequest.operation = ARPPacket.ARP_REQUEST;
+				CustomPacket cpProcesado = new CustomPacket(arpRequest,false);
 				miCapa.miSemaforo.acquire();
 				miCapa.misPaquetes.add(cpProcesado);
 				miCapa.miSemaforo.release();
-				System.out.println("Awaiting destination response. Please wait...");
+				System.out.println("Awaiting destination response. Ask again in 60 seconds.");
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	public static byte[] hexStringToByteArray(String s) {
@@ -84,8 +93,5 @@ public class ARP extends Protocol{
 	                             + Character.digit(s.charAt(i+1), 16));
 	    }
 	    return data;
-	}
-	public byte[] getIPUser() {
-		return Principal.userIP;
 	}
 }
