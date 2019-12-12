@@ -47,7 +47,7 @@ public class Layer1 extends Layer{
 		try {
 			//open a network interface to send a packet to
 			captor=JpcapCaptor.openDevice(devices[number], 65535, true, 20); //boolean promics changed to true	
-			//sender=JpcapSender.openDevice(devices[number]);
+			sender=JpcapSender.openDevice(devices[number]);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

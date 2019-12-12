@@ -2,13 +2,12 @@ import jpcap.packet.ARPPacket;
 import jpcap.packet.EthernetPacket;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class ARP extends Protocol{
     
-	public Map<byte[], byte[]> arpTable = new HashMap<>();
+	public HashMap<byte[], byte[]> arpTable = new HashMap<>();
     byte[] broadcastIP = hexStringToByteArray("FFFFFFFF"); //255.255.255.255
-   
+    int contador=0;
     @Override
 	public void configuration() {
 		endTime = false;
@@ -28,7 +27,7 @@ public class ARP extends Protocol{
 					ARPPacket ap = (ARPPacket) paquete.packet;
 					EthernetPacket ep = (EthernetPacket) ap.datalink;
 					
-					if(ap.operation == ARPPacket.ARP_REQUEST) { //Hacer paquete de reply
+					if(ap.operation == ARPPacket.ARP_REQUEST) { //Make a reply ARPPacket
 						ARPPacket arp = new ARPPacket();
 						
 						arp.hardtype = ARPPacket.HARDTYPE_ETHER;
@@ -45,6 +44,10 @@ public class ARP extends Protocol{
 						miSemaforo.acquire();
 						arpTable.put(ap.sender_protoaddr,ep.src_mac);
 						miSemaforo.release();
+						contador++;
+						if(contador==30) {// is the number of ARPPackets until the table is refreshed
+							arpTable.clear();
+						}
 					}
 				}
 			}
@@ -57,7 +60,8 @@ public class ARP extends Protocol{
 	
 	public void translator(byte[] IPtranslate) {
 		try {
-			if(arpTable.containsKey(IPtranslate)) {
+			if(arpTable.containsKey(IPtranslate)) { 
+				
 				miSemaforo.acquire();
 				System.out.println("The MAC address that you are looking for is: " + arpTable.get(IPtranslate));
 				miSemaforo.release();
@@ -72,7 +76,7 @@ public class ARP extends Protocol{
 				arpRequest.sender_hardaddr = ((Layer2) ((Layer3) miCapa).down).sourceMAC;
 				arpRequest.sender_protoaddr = ((Layer3) miCapa).sourceIP;
 				arpRequest.target_hardaddr = hexStringToByteArray("000000000000");
-				arpRequest.target_protoaddr = broadcastIP;
+				arpRequest.target_protoaddr = IPtranslate;
 				arpRequest.operation = ARPPacket.ARP_REQUEST;
 				CustomPacket cpProcesado = new CustomPacket(arpRequest,false);
 				miCapa.miSemaforo.acquire();

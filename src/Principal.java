@@ -1,6 +1,6 @@
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Scanner;
+
 
 public class Principal {
 
@@ -45,7 +45,7 @@ public class Principal {
 				if(response == 2) exit = true;
 				else ARPProtocol.translator(askIP());
 			}
-
+			System.out.println("Terminating....");
 			miCapa1.endTime = true;
 
 
@@ -60,25 +60,23 @@ public class Principal {
 			@SuppressWarnings("resource")
 			Scanner input = new Scanner(System.in);
 			String stringAux = input.next();
-			String[] parts = stringAux.split(".");
-			stringAux = Arrays.toString(parts);
-			byte[] byteArr = stringAux.getBytes();
-			return byteArr;
+			return stringToByteArray(stringAux);
 
 		}catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Invalid IP Address");
 			return null;
 		}
-		
 	}
 
-	public static byte[] hexStringToByteArray(String s) {
-		int len = s.length();
-		byte[] data = new byte[len / 2];
-		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+	public static byte[] stringToByteArray(String s) {
+		String[] ipArr = s.split("\\.");
+		byte[] ipAddr = new byte[4];
+
+		for (int i = 0; i < 4; i++) {
+			int digit = Integer.parseInt(ipArr[i]);
+			ipAddr[i] = (byte) digit;
 		}
-		return data;
+
+		return ipAddr;
 	}
 }

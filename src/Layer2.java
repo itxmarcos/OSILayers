@@ -31,13 +31,13 @@ public class Layer2 extends Layer{
 				@SuppressWarnings("resource")
 				Scanner input2 = new Scanner(System.in);
 				String stringAux = input2.next();
-				if(!validate(stringAux)) { //Check if MAC is correct
-					while (!validate(stringAux)){
+				if(!isValidMAC(stringAux)) { //Check if MAC is correct
+					while (!isValidMAC(stringAux)){
 						System.out.println("Invalid MAC introduce it again please: ");
 						stringAux = input2.next();
 					}
 				}
-				this.sourceMAC = hexStringToByteArray(stringAux.split(":").toString());
+				this.sourceMAC = hexStringToByteArray((stringAux.split("\\:")).toString());
 			}
 			
 		}catch (Exception e) {
@@ -78,6 +78,7 @@ public class Layer2 extends Layer{
 						EthernetPacket ep = new EthernetPacket();
 						
 						ep.src_mac = sourceMAC;
+						ep.frametype = EthernetPacket.ETHERTYPE_ARP;
 						
 						if(ap.operation == ARPPacket.ARP_REQUEST) ep.dst_mac = broadcastMAC;
 						else if (ap.operation == ARPPacket.ARP_REPLY) ep.dst_mac = ap.target_hardaddr;
@@ -143,7 +144,7 @@ public class Layer2 extends Layer{
 
 		return condition;
 	}
-	public boolean validate(String mac) {
+	public boolean isValidMAC(String mac) {
         Pattern p = Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
 		   Matcher m = p.matcher(mac);
 		   return m.find();

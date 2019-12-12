@@ -1,7 +1,8 @@
 import jpcap.packet.ARPPacket; 
-import java. util. Arrays;
 
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jpcap.packet.EthernetPacket;
 import jpcap.packet.Packet;
@@ -24,14 +25,16 @@ public class Layer3 extends Layer{
 			@SuppressWarnings("resource")
 			Scanner input = new Scanner(System.in);
 			String stringAux = input.next();
-			String[] parts = stringAux.split(".");
-			stringAux = Arrays.toString(parts);
-			byte[] byteArr = stringAux.getBytes();
-			sourceIP = byteArr;
+			if(!isValidIP(stringAux)) { //Check if MAC is correct
+				while (!isValidIP(stringAux)){
+					System.out.println("Invalid IP introduce it again please separated by '.' : ");
+					stringAux = input.next();
+				}
+			}
+			sourceIP = stringToByteArray(stringAux);
 		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Invalid IP Address");
 		}
 	}
 
@@ -48,8 +51,6 @@ public class Layer3 extends Layer{
 						p = cpProcesado.packet;
 						EthernetPacket ep = (EthernetPacket) p.datalink;
 						type = ep.frametype;
-
-
 
 						if(type==EthernetPacket.ETHERTYPE_ARP && compareIPs(((ARPPacket) p).target_protoaddr)) {
 
@@ -108,5 +109,21 @@ public class Layer3 extends Layer{
 					+ Character.digit(s.charAt(i+1), 16));
 		}
 		return data;
+	}
+	public static boolean isValidIP(String ipAddr){
+		Pattern ptn = Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
+		Matcher mtch = ptn.matcher(ipAddr);
+		return mtch.find();
+	}
+	public static byte[] stringToByteArray(String s) {
+		String[] ipArr = s.split("\\.");
+		byte[] ipAddr = new byte[4];
+
+		for (int i = 0; i < 4; i++) {
+			int digit = Integer.parseInt(ipArr[i]);
+			ipAddr[i] = (byte) digit;
+		}
+
+		return ipAddr;
 	}
 }
