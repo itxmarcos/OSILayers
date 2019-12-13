@@ -21,17 +21,17 @@ public class Layer3 extends Layer{
 	public void configuration() {
 		endTime = false;
 		try {
-			System.out.println("\nIntroduce your IP address separated by '.' :");
+			System.out.println("\nIntroduce your IP address separated by '.':");
 			@SuppressWarnings("resource")
 			Scanner input = new Scanner(System.in);
 			String stringAux = input.next();
-			if(!isValidIP(stringAux)) { //Check if MAC is correct
+			if(!isValidIP(stringAux)) { //Check if IP is correct
 				while (!isValidIP(stringAux)){
-					System.out.println("Invalid IP introduce it again please separated by '.' : ");
+					System.out.println("Invalid IP, introduce it again please separated by '.': ");
 					stringAux = input.next();
 				}
 			}
-			sourceIP = stringToByteArray(stringAux);
+			this.sourceIP = stringToByteArray(stringAux);
 		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,7 +123,6 @@ public class Layer3 extends Layer{
 			int digit = Integer.parseInt(ipArr[i]);
 			ipAddr[i] = (byte) digit;
 		}
-
 		return ipAddr;
 	}
 }
