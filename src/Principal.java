@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Principal {
@@ -60,6 +62,12 @@ public class Principal {
 			@SuppressWarnings("resource")
 			Scanner input = new Scanner(System.in);
 			String stringAux = input.next();
+			if(!isValidIP(stringAux)) { //Check if IP is correct
+				while (!isValidIP(stringAux)){
+					System.out.println("Invalid IP, introduce it again please separated by '.': ");
+					stringAux = input.next();
+				}
+			}
 			return stringToByteArray(stringAux);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -76,5 +84,10 @@ public class Principal {
 		}
 
 		return ipAddr;
+	}
+	public static boolean isValidIP(String ipAddr){
+		Pattern ptn = Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
+		Matcher mtch = ptn.matcher(ipAddr);
+		return mtch.find();
 	}
 }
