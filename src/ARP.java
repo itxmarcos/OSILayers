@@ -33,7 +33,10 @@ public class ARP extends Protocol{
 						arp.target_hardaddr = ap.sender_hardaddr;
 						arp.target_protoaddr = ap.sender_protoaddr;
 						arp.operation=ARPPacket.ARP_REPLY;
-						//Faltaría pasárselo a Layer3
+						CustomPacket cpProcesado = new CustomPacket(arp,false);
+						miCapa.miSemaforo.acquire();
+						miCapa.misPaquetes.add(cpProcesado);
+						miCapa.miSemaforo.release();
 					}
 					else if(ap.operation == ARPPacket.ARP_REPLY){ //Receive a reply from another device
 						miSemaforo.acquire();

@@ -63,7 +63,7 @@ public class Layer3 extends Layer{
 						} else {
 							//System.out.println("The packet cannot be processed");
 						}
-					}¡
+					}
 					else{
 						down.miSemaforo.acquire();
 						down.misPaquetes.add(cpProcesado);
