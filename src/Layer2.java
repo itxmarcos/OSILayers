@@ -22,15 +22,15 @@ public class Layer2 extends Layer{
 			if(userRespond==1) this.sourceMAC = ((Layer1) down).getMacAdress();
 			else if(userRespond==2) {
 				System.out.println("\nIntroduce the MAC address in Hexadecimal separated by ':': ");
+				@SuppressWarnings("resource")
 				Scanner input2 = new Scanner(System.in);
 				String stringAux = input2.next();
 				if(!isValidMAC(stringAux)) { //Check if MAC is correct
-					while (!isValidIP(stringAux)){
+					while (!isValidMAC(stringAux)){
 						System.out.println("Invalid MAC, introduce it again please separated by ':': ");
 						stringAux = input2.next();
 					}
 				}
-				//this.sourceMAC = hexStringToByteArray((stringAux.split("\\:")).toString());
 				this.sourceMAC = stringToByteArray(stringAux);
 			}
 			
@@ -89,7 +89,7 @@ public class Layer2 extends Layer{
 	}
 
 	public static byte[] stringToByteArray(String s) {
-		String[] ipArr = s.split("\\.");
+		String[] ipArr = s.split("\\:");
 		byte[] ipAddr = new byte[4];
 
 		for (int i = 0; i < 4; i++) {
