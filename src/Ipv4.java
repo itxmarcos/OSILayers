@@ -12,7 +12,6 @@ public class Ipv4 extends Protocol {
 				miSemaforo.acquire();
 				CustomPacket paquete = misPaquetes.poll();
 				miSemaforo.release();
-				
 //				if(paquete != null)	System.out.println("IPV4 packet processed: "+ (IPPacket) paquete.packet);
 			}
 		}

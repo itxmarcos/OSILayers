@@ -41,56 +41,38 @@ public class Layer2 extends Layer{
 	}
 
 	public void run() {
-
 		try {
-
 			while(!endTime || !misPaquetes.isEmpty()) {
-
 				miSemaforo.acquire();
 				CustomPacket cp = misPaquetes.poll();
 				miSemaforo.release();
-
 				if(cp != null) {
-					
 					Packet p = cp.packet;
-					
-					
 					if(cp.direction){
-						
 						EthernetPacket ep = (EthernetPacket) p.datalink;
 						if(compareSourceBroadcastMACs(ep.dst_mac)) {
-							
 							up.miSemaforo.acquire();
 							up.misPaquetes.add(cp);
 							up.miSemaforo.release();
-
 							//System.out.println("Packet sent to L3");
 						}
 					}
 					else{
-						
 						ARPPacket ap = (ARPPacket) p;
 						EthernetPacket ep = new EthernetPacket();
-						
 						ep.src_mac = sourceMAC;
 						ep.frametype = EthernetPacket.ETHERTYPE_ARP;
-						
 						if(ap.operation == ARPPacket.ARP_REQUEST) ep.dst_mac = broadcastMAC;
 						else if (ap.operation == ARPPacket.ARP_REPLY) ep.dst_mac = ap.target_hardaddr;
-						
 						p.datalink = ep;
-						
 						down.miSemaforo.acquire();
 						down.misPaquetes.add(cp);
 						down.miSemaforo.release();
-						
 						//System.out.println("Packet sent to L1");
 					}
 				}
-
 			}
 			up.endTime=true;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

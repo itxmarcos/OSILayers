@@ -15,21 +15,15 @@ public class ARP extends Protocol{
 	@Override
 	public void run() {
 		try {
-			
 			while(!endTime || !misPaquetes.isEmpty()) {
-				
 				miSemaforo.acquire();
 				CustomPacket paquete = misPaquetes.poll();
 				miSemaforo.release();
-			
 				if(paquete != null)	{
-					
 					ARPPacket ap = (ARPPacket) paquete.packet;
 					EthernetPacket ep = (EthernetPacket) ap.datalink;
-					
 					if(ap.operation == ARPPacket.ARP_REQUEST) { //Make a reply ARPPacket
 						ARPPacket arp = new ARPPacket();
-						
 						arp.hardtype = ARPPacket.HARDTYPE_ETHER;
 						arp.prototype = ARPPacket.PROTOTYPE_IP;
 						arp.hlen = 6;
@@ -40,7 +34,7 @@ public class ARP extends Protocol{
 						arp.target_protoaddr = ap.sender_protoaddr;
 						arp.operation=ARPPacket.ARP_REPLY;
 					}
-					else if(ap.operation == ARPPacket.ARP_REPLY){
+					else if(ap.operation == ARPPacket.ARP_REPLY){ //Receive a reply from another device
 						miSemaforo.acquire();
 						arpTable.put(ap.sender_protoaddr,ep.src_mac);
 						miSemaforo.release();
@@ -57,16 +51,13 @@ public class ARP extends Protocol{
 		}
 	}
 	
-	
 	public void translator(byte[] IPtranslate) {
 		try {
-			if(arpTable.containsKey(IPtranslate)) { 
-				
+			if(arpTable.containsKey(IPtranslate)) {
 				miSemaforo.acquire();
 				System.out.println("The MAC address that you are looking for is: " + arpTable.get(IPtranslate));
 				miSemaforo.release();
 				}
-				
 			else {
 				ARPPacket arpRequest = new ARPPacket();
 				arpRequest.hardtype = ARPPacket.HARDTYPE_ETHER;

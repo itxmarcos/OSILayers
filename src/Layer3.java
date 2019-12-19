@@ -8,7 +8,6 @@ import jpcap.packet.EthernetPacket;
 import jpcap.packet.Packet;
 
 public class Layer3 extends Layer{
-
 	Packet p;
 	int type;
 	byte[] sourceIP;
@@ -45,31 +44,26 @@ public class Layer3 extends Layer{
 				miSemaforo.acquire();
 				CustomPacket cpProcesado = misPaquetes.poll();
 				miSemaforo.release();
-
 				if(cpProcesado != null) {
 					if(cpProcesado.direction){
 						p = cpProcesado.packet;
 						EthernetPacket ep = (EthernetPacket) p.datalink;
 						type = ep.frametype;
-
 						if(type==EthernetPacket.ETHERTYPE_ARP && compareIPs(((ARPPacket) p).target_protoaddr)) {
-
 							ARP.miSemaforo.acquire();
 							ARP.misPaquetes.add(cpProcesado);
 							ARP.miSemaforo.release();
-
-					//		System.out.println("Packet sent to ARP");
+							//System.out.println("Packet sent to ARP");
 						}
 						else if(type==EthernetPacket.ETHERTYPE_IP) {
 							IPV.miSemaforo.acquire();
 							IPV.misPaquetes.add(cpProcesado);
 							IPV.miSemaforo.release();
-
-					//		System.out.println("Packet sent to IPV");
+							//System.out.println("Packet sent to IPV");
 						} else {
-					//		System.out.println("The packet cannot be processed");
+							//System.out.println("The packet cannot be processed");
 						}
-					}
+					}¡
 					else{
 						down.miSemaforo.acquire();
 						down.misPaquetes.add(cpProcesado);
@@ -86,19 +80,15 @@ public class Layer3 extends Layer{
 	}
 	
 	public boolean compareIPs(byte[] IP) {
-
 		boolean condition = false;
-
 		if(IP[0] == sourceIP[0] &&
 				IP[1] == sourceIP[1] &&
 				IP[2] == sourceIP[2] &&
 				IP[3] == sourceIP[3]) condition = true;
-
 		if(IP[0] == broadcastIP[0] &&
 				IP[1] == broadcastIP[1] &&
 				IP[2] == broadcastIP[2] &&
 				IP[3] == broadcastIP[3]) condition = true;
-
 		return condition;
 	}
 	public static byte[] hexStringToByteArray(String s) {
@@ -118,7 +108,6 @@ public class Layer3 extends Layer{
 	public static byte[] stringToByteArray(String s) {
 		String[] ipArr = s.split("\\.");
 		byte[] ipAddr = new byte[4];
-
 		for (int i = 0; i < 4; i++) {
 			int digit = Integer.parseInt(ipArr[i]);
 			ipAddr[i] = (byte) digit;

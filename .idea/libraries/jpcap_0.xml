@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="jpcap-0">
+    <CLASSES />
+    <JAVADOC>
+      <root url="file://$USER_HOME$/Documents/Java/jpcap-0.7/doc" />
+      <root url="file://$USER_HOME$/Documents/Java/jpcap-0.7/doc/javadoc" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$USER_HOME$/Documents/Java/jpcap-0.7/lib" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://$USER_HOME$/Documents/Java/jpcap-0.7/src/java" />
+    </SOURCES>
+  </library>
+</component>

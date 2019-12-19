@@ -61,7 +61,6 @@ public class Principal {
 			Scanner input = new Scanner(System.in);
 			String stringAux = input.next();
 			return stringToByteArray(stringAux);
-
 		}catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -71,7 +70,6 @@ public class Principal {
 	public static byte[] stringToByteArray(String s) {
 		String[] ipArr = s.split("\\.");
 		byte[] ipAddr = new byte[4];
-
 		for (int i = 0; i < 4; i++) {
 			int digit = Integer.parseInt(ipArr[i]);
 			ipAddr[i] = (byte) digit;
