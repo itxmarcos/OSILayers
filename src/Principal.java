@@ -24,7 +24,8 @@ public class Principal {
 			miCapa3.IPV = IPVProtocol;
 
 			ARPProtocol.miCapa = miCapa3;
-
+			IPVProtocol.miCapa = miCapa3;
+			
 			miCapa1.configuration();
 			miCapa2.configuration();
 			miCapa3.configuration();
@@ -45,7 +46,7 @@ public class Principal {
 				System.out.println("Do you want to check for an IP? [1=YES, 2=NO]");
 				int response = input.nextInt();
 				if(response == 2) exit = true;
-				else ARPProtocol.translator(askIP());
+				else IPVProtocol.pingResponse(askIP());
 			}
 			System.out.println("Terminating....");
 			miCapa1.endTime = true;

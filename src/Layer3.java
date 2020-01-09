@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jpcap.packet.EthernetPacket;
+import jpcap.packet.IPPacket;
 import jpcap.packet.Packet;
 
 public class Layer3 extends Layer{
@@ -12,7 +13,7 @@ public class Layer3 extends Layer{
 	int type;
 	byte[] sourceIP;
 	byte[] broadcastIP = hexStringToByteArray("FFFFFFFF"); //255.255.255.255
-
+	byte[] networkSubnet;
 	public ARP ARP;
 	public Ipv4 IPV;
 
@@ -31,6 +32,17 @@ public class Layer3 extends Layer{
 				}
 			}
 			this.sourceIP = stringToByteArray(stringAux);
+			System.out.println("\nIntroduce the subnet mask address separated by '.':");
+			@SuppressWarnings("resource")
+			Scanner input2 = new Scanner(System.in);
+			String stringAuxSubnet = input2.next();
+			if(!isValidIP(stringAuxSubnet)) { //Check if IP is correct
+				while (!isValidIP(stringAuxSubnet)){
+					System.out.println("Invalid IP, introduce it again please separated by '.': ");
+					stringAuxSubnet = input2.next();
+				}
+			}
+			this.networkSubnet = stringToByteArray(stringAuxSubnet);	
 		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,7 +67,7 @@ public class Layer3 extends Layer{
 							ARP.miSemaforo.release();
 							//System.out.println("Packet sent to ARP");
 						}
-						else if(type==EthernetPacket.ETHERTYPE_IP) {
+						else if(type==EthernetPacket.ETHERTYPE_IPV6 && compareIPAndBroadCastNetwork((((IPPacket) p).dst_ip).getAddress())) {
 							IPV.miSemaforo.acquire();
 							IPV.misPaquetes.add(cpProcesado);
 							IPV.miSemaforo.release();
@@ -80,6 +92,19 @@ public class Layer3 extends Layer{
 	}
 	
 	public boolean compareIPs(byte[] IP) {
+		boolean condition = false;
+		if(IP[0] == sourceIP[0] &&
+				IP[1] == sourceIP[1] &&
+				IP[2] == sourceIP[2] &&
+				IP[3] == sourceIP[3]) condition = true;
+		if(IP[0] == broadcastIP[0] &&
+				IP[1] == broadcastIP[1] &&
+				IP[2] == broadcastIP[2] &&
+				IP[3] == broadcastIP[3]) condition = true;
+		return condition;
+	}
+	public boolean compareIPAndBroadCastNetwork(byte[] IP) {
+		//Metodo para ver si tambien es de la broadcast address of the network 
 		boolean condition = false;
 		if(IP[0] == sourceIP[0] &&
 				IP[1] == sourceIP[1] &&

@@ -79,7 +79,7 @@ public class Layer2 extends Layer{
 						
 						ep.src_mac = sourceMAC;
 						ep.frametype = EthernetPacket.ETHERTYPE_ARP;
-						
+						//codear 2 tipos de paquetes ARP y IP
 						if(ap.operation == ARPPacket.ARP_REQUEST) ep.dst_mac = broadcastMAC;
 						else if (ap.operation == ARPPacket.ARP_REPLY) ep.dst_mac = ap.target_hardaddr;
 						
